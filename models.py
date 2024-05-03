@@ -14,4 +14,10 @@ class Snowboard(BaseModel):
     has_bindings: bool
     brand: Brand
 
+class CreateSnowboard(BaseModel):
+    length: int
+    color: str
+    has_bindings: bool
+    brand: Brand
+
 
