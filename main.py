@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 
-from models import Snowboard
+from models import Snowboard, CreateSnowboard
 import json
 
 
@@ -18,16 +18,28 @@ for snowboard in snowboard_list:
 async def get_snowboards() -> list[Snowboard]:
     return snowboards
 
-@app.post("/snowboards")
-def create_snowboard(snowboard: Snowboard) -> None:
-    snowboards.append(snowboard)
 
-@app.put("/snowboards/{snowboard_id}")
-async def update_snowboard(snowboard_id: int, updated_snowboard: Snowboard) -> str:
-    for snowboard in range(len(snowboards)):
-        if snowboard_id == snowboards[snowboard].id:
-            snowboards[snowboard] = updated_snowboard
+@app.post("/snowboards")
+def create_snowboard(new_snowboard:CreateSnowboard) -> str:
+    snowboard_id = len(snowboards)+1
+    snowboard = Snowboard(
+        id = snowboard_id,
+        length = new_snowboard.length,
+        color = new_snowboard.color,
+        has_bindings = new_snowboard.has_bindings,
+        brand = new_snowboard.brand)
+    snowboards.append(snowboard)
+    return "Snowboard added succesfully."
+
+
+@app.put("/snowboards")
+async def update_snowboard(updated_snowboard: Snowboard, snowboard_id: int = None):
+    for i, snowboard in enumerate(snowboards):
+        if snowboard_id == snowboard.id:
+            snowboards[i] = updated_snowboard
             return "Snowboard updated successfully"
+    create_snowboard(updated_snowboard)
+
 
 @app.delete("/snowboards/{snowboard_id}")
 async def delete_snowboard(snowboard_id: int) -> str:
@@ -35,3 +47,4 @@ async def delete_snowboard(snowboard_id: int) -> str:
         if snowboard_id == snowboard.id:
             snowboards.pop(i)
             return "Snowboard deleted"
+        
